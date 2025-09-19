@@ -12,16 +12,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install dependencies 
-        run: npm install  
+      - name: Install dependencies
+        run: npm install
 
       - name: Check style
         run: npm run eslint
 
       - name: Make a build
         run: npm run build
-      
+
       - name: Run tests
         run: npm run test -- --coverage
+
+      - name: e2e tests
+        uses: cypress-io/github-action@v5
+        with:
+          command: npm run test:e2e
+          start: npm run start-prod
+          wait-on: http://localhost:5000

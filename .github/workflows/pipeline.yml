@@ -36,6 +36,11 @@ jobs:
           start: npm run start-prod
           wait-on: http://localhost:5000
 
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install Railway CLI
         if: ${{ github.event_name == 'push' }}
         run: npm install -g @railway/cli

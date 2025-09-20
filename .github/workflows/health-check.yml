@@ -1,0 +1,30 @@
+name: Periodic Health Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployed app health
+        uses: Jtalk/url-health-check-action@v4
+        with:
+          url: https://full-stack-open-pokedex-production-9f0d.up.railway.app/
+          max-attempts: 3
+          retry-delay: 10s
+          follow-redirect: true
+
+      - name: Notify Discord on failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          nodetail: true
+          status: ${{ job.status }}
+          title: '❌ Health check failed'
+          color: '0xff0000'
+          description: |
+            Health check for

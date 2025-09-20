@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
   simple_deployment_pipeline:
@@ -34,9 +37,11 @@ jobs:
           wait-on: http://localhost:5000
 
       - name: Install Railway CLI
+        if: ${{ github.event_name == 'push' }}
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
+        if: ${{ github.event_name == 'push' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: railway up --ci --service full-stack-open-pokedex

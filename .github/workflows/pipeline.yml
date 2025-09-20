@@ -1,5 +1,8 @@
 name: Deployment pipeline
 
+env:
+  IS_DEPLOY: ${{ (github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip')) || (github.event_name == 'pull_request' && !contains(github.event.pull_request.title, '#skip') && !contains(github.event.pull_request.body, '#skip')) }}
+
 on:
   push:
     branches:
@@ -36,12 +39,19 @@ jobs:
           start: npm run start-prod
           wait-on: http://localhost:5000
 
+
+      - name: Bump version and push tag
+        if: ${{ env.IS_DEPLOY == 'true' }}
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install Railway CLI
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ env.IS_DEPLOY == 'true' }}
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ env.IS_DEPLOY == 'true' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: railway up --ci --service full-stack-open-pokedex

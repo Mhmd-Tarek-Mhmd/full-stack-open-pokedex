@@ -46,15 +46,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Railway CLI
+      - name: Install Vercel CLI
         if: ${{ env.IS_DEPLOY == 'true' }}
-        run: npm install -g @railway/cli
+        run: npm install -g vercel
 
-      - name: Deploy to Railway
+      - name: Deploy to Vercel
         if: ${{ env.IS_DEPLOY == 'true' }}
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --ci --service full-stack-open-pokedex
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --token $VERCEL_TOKEN
 
       - name: Notify Discord
         if: always()
@@ -63,7 +63,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           nodetail: true
           status: ${{ job.status }}
-          title: ${{ job.status == 'success' && '🚀 A new version of Pokedex deployed' || '❌ Build failed' }}
+          title: ${{ job.status == 'success' && '🚀 A new version deployed' || '❌ Build failed' }}
           color: ${{ job.status == 'success' && '0x00ff00' || '0xff0000' }}
           description: |
             **Commit:** [${{ github.sha }}](${{ github.event.head_commit.url }})  

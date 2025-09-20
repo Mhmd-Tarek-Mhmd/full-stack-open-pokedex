@@ -39,7 +39,6 @@ jobs:
           start: npm run start-prod
           wait-on: http://localhost:5000
 
-
       - name: Bump version and push tag
         if: ${{ env.IS_DEPLOY == 'true' }}
         uses: anothrNick/github-tag-action@1.64.0
@@ -55,3 +54,12 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: railway up --ci --service full-stack-open-pokedex
+
+      - name: Notify Discord
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
+            🚀 Deployment for full-stack-open-pokedex completed!
+            Commit: ${{ github.sha }}
+            By: ${{ github.actor }}      
